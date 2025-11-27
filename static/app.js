@@ -12,6 +12,23 @@ let state = {
     }
 };
 
+// 난이도/주제 한글 이름 매핑
+const DIFFICULTY_NAMES = {
+    'beginner': '초급',
+    'intermediate': '중급',
+    'advanced': '고급'
+};
+
+const TOPIC_NAMES = {
+    'free': '자유 대화',
+    'dailyLife': '일상생활',
+    'travel': '여행',
+    'food': '음식',
+    'culture': '문화',
+    'business': '비즈니스',
+    'anime': '애니/만화'
+};
+
 // DOM 요소
 const messagesContainer = document.getElementById('messages');
 const messageInput = document.getElementById('messageInput');
@@ -57,26 +74,71 @@ function applySettingsToUI() {
     document.querySelectorAll('.topic-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.value === state.settings.topic);
     });
+    
+    // 상태 바 업데이트
+    updateStatusBar();
+}
+
+// 상태 바 업데이트
+function updateStatusBar() {
+    const difficultyStatus = document.getElementById('difficultyStatus');
+    const topicStatus = document.getElementById('topicStatus');
+    
+    if (difficultyStatus) {
+        difficultyStatus.textContent = '📚 ' + DIFFICULTY_NAMES[state.settings.difficulty];
+    }
+    if (topicStatus) {
+        topicStatus.textContent = '💬 ' + TOPIC_NAMES[state.settings.topic];
+    }
 }
 
 // 설정 저장
 function saveSettings() {
+    // 이전 설정 저장
+    const prevDifficulty = state.settings.difficulty;
+    const prevTopic = state.settings.topic;
+    
+    // 새 설정 가져오기 (모달 내의 버튼에서)
+    const activeSegment = document.querySelector('#settingsModal .segment.active');
+    const activeTopic = document.querySelector('#settingsModal .topic-btn.active');
+    
+    const newDifficulty = activeSegment ? activeSegment.dataset.value : 'beginner';
+    const newTopic = activeTopic ? activeTopic.dataset.value : 'free';
+    
+    console.log('저장 - 이전 난이도:', prevDifficulty, '새 난이도:', newDifficulty);
+    console.log('저장 - 이전 주제:', prevTopic, '새 주제:', newTopic);
+    
     state.settings = {
         apiKey: document.getElementById('apiKey').value,
         partnerName: document.getElementById('partnerName').value || '유키',
-        difficulty: document.querySelector('.segment.active').dataset.value,
-        topic: document.querySelector('.topic-btn.active').dataset.value,
+        difficulty: newDifficulty,
+        topic: newTopic,
         showTranslation: document.getElementById('showTranslation').checked,
         showFurigana: document.getElementById('showFurigana').checked
     };
     
+    // localStorage에 저장
     localStorage.setItem('nihongoSettings', JSON.stringify(state.settings));
-    toggleSettings();
     
-    // 파트너 이름이 바뀌었으면 환영 메시지 갱신
-    if (state.messages.length === 0) {
+    // 난이도나 주제가 바뀌면 대화 새로 시작
+    const settingsChanged = (prevDifficulty !== newDifficulty || prevTopic !== newTopic);
+    console.log('설정 변경됨:', settingsChanged);
+    
+    if (settingsChanged) {
+        // 이전 대화 삭제
+        state.messages = [];
+        localStorage.removeItem('nihongoMessages');
+        addWelcomeMessage();
+    } else if (state.messages.length === 0) {
         addWelcomeMessage();
     }
+    
+    // 상태 바 업데이트
+    updateStatusBar();
+    console.log('상태 바 업데이트 완료 - 현재 난이도:', state.settings.difficulty);
+    
+    // 모달 닫기
+    toggleSettings();
 }
 
 // 메시지 로드

@@ -15,39 +15,6 @@ app = FastAPI(title="니혼고챗", description="일본어 학습 채팅 앱")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# 난이도별 프롬프트
-DIFFICULTY_PROMPTS = {
-    "beginner": """당신은 일본어를 배우는 한국인의 일본인 친구입니다. 쉬운 일본어로 대화해주세요.
-- 히라가나와 카타카나를 주로 사용해주세요
-- 쉬운 단어와 짧은 문장을 사용해주세요
-- 존댓말(です・ます형)을 사용해주세요
-- 상대방의 일본어 실수를 부드럽게 고쳐주세요
-- 가끔 한국어로 설명을 덧붙여도 좋습니다""",
-    
-    "intermediate": """당신은 일본어를 배우는 한국인의 일본인 친구입니다. 자연스러운 일본어로 대화해주세요.
-- 한자도 적당히 사용해주세요 (읽는 법 포함)
-- 일상회화 수준의 표현을 사용해주세요
-- 존댓말과 반말을 상황에 맞게 사용해주세요
-- 문법 실수가 있으면 자연스럽게 올바른 표현을 알려주세요""",
-    
-    "advanced": """당신은 일본어를 배우는 한국인의 일본인 친구입니다. 자연스럽고 고급스러운 일본어로 대화해주세요.
-- 네이티브 수준의 표현을 사용해주세요
-- 관용구나 슬랭도 적절히 사용해주세요
-- 비즈니스 일본어나 경어 표현도 포함해주세요
-- 더 자연스러운 표현이 있으면 제안해주세요"""
-}
-
-# 주제별 프롬프트
-TOPIC_PROMPTS = {
-    "free": "자유롭게 대화해주세요.",
-    "dailyLife": "일상생활에 대해 이야기해주세요. (아침에 일어나서 잠들기까지의 일들)",
-    "travel": "일본 여행에 대해 이야기해주세요. (관광지, 교통, 숙박 등)",
-    "food": "일본 음식이나 요리에 대해 이야기해주세요.",
-    "culture": "일본 문화에 대해 이야기해주세요. (축제, 습관, 전통 등)",
-    "business": "비즈니스 일본어로 대화해주세요. (회의, 전화 응대, 이메일 등)",
-    "anime": "애니메이션이나 만화에 대해 이야기해주세요."
-}
-
 
 class ChatRequest(BaseModel):
     message: str
@@ -67,18 +34,11 @@ def get_system_prompt(partner_name: str, difficulty: str, topic: str) -> str:
     difficulty_prompt = DIFFICULTY_PROMPTS.get(difficulty, DIFFICULTY_PROMPTS["beginner"])
     topic_prompt = TOPIC_PROMPTS.get(topic, TOPIC_PROMPTS["free"])
     
-    return f"""당신의 이름은 "{partner_name}"입니다. 일본에 사는 20대 일본인입니다.
-{difficulty_prompt}
-
-대화 주제: {topic_prompt}
-
-중요한 규칙:
-- 한국인 일본어 학습자와 친구처럼 자연스럽게 대화해주세요
-- 너무 긴 답변은 피하고, 2-3문장 정도로 답해주세요
-- 가끔 질문을 던져서 대화를 이어가주세요
-- 상대방의 일본어가 틀리면 자연스럽게 올바른 표현으로 답해주세요
-- 이모지를 적당히 사용해서 친근한 분위기를 만들어주세요
-- 반드시 일본어로 대화해주세요"""
+    return SYSTEM_PROMPT_TEMPLATE.format(
+        partner_name=partner_name,
+        difficulty_prompt=difficulty_prompt,
+        topic_prompt=topic_prompt
+    )
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -122,7 +82,7 @@ async def translate(req: TranslateRequest):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "당신은 번역가입니다. 주어진 일본어를 한국어로 번역해주세요. 번역만 출력해주세요."},
+                {"role": "system", "content": TRANSLATE_PROMPT},
                 {"role": "user", "content": req.text}
             ],
             temperature=0.3,
@@ -146,10 +106,7 @@ async def furigana(req: TranslateRequest):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": """주어진 일본어 문장에 후리가나를 붙여주세요.
-한자 옆에 히라가나로 읽는 법을 표시해주세요.
-형식: 한자(후리가나)
-예: 今日(きょう)は天気(てんき)がいいですね。"""},
+                {"role": "system", "content": FURIGANA_PROMPT},
                 {"role": "user", "content": req.text}
             ],
             temperature=0.1,
@@ -162,7 +119,85 @@ async def furigana(req: TranslateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ============================================================
+# PROMPT SETTINGS
+# ============================================================
+
+# Difficulty Prompts
+BEGINNER_PROMPT = """
+# Difficulty: Beginner
+# Persona: You are a Japanese friend of a Korean person learning Japanese. Please speak in easy Japanese at a kindergarten level.
+- Use mainly hiragana and katakana
+- Use simple words and short sentences. Keep responses to 1-2 sentences.
+- Use polite form (です・ます form)
+"""
+
+INTERMEDIATE_PROMPT = """
+# Difficulty: Intermediate
+# Persona: You are a Japanese friend of a Korean person learning Japanese. Please speak in natural Japanese at a middle school level.
+- Use kanji moderately (include readings)
+- Use everyday conversational expressions
+- Use polite and casual speech appropriately depending on the situation
+- If there are grammar mistakes, naturally guide them to the correct expression
+- Avoid long responses, keep it to 2-3 sentences"""
+
+ADVANCED_PROMPT = """
+# Difficulty: Advanced
+# Persona: You are a Japanese friend of a Korean person learning Japanese. Please speak in natural and sophisticated Japanese at a high school level.
+- Use native-level expressions
+- Use idioms and slang appropriately
+- Include business Japanese and honorific expressions
+- Suggest more natural expressions when available"""
+
+DIFFICULTY_PROMPTS = {
+    "beginner": BEGINNER_PROMPT,
+    "intermediate": INTERMEDIATE_PROMPT,
+    "advanced": ADVANCED_PROMPT
+}
+
+# --------------------------------------------------------------------------------------
+
+# Topic Prompts
+TOPIC_PROMPTS = {
+    "free": "Feel free to talk about anything.",
+    "dailyLife": "Talk about daily life. (From waking up in the morning to going to bed)",
+    "travel": "Talk about traveling in Japan. (Tourist spots, transportation, accommodation, etc.)",
+    "food": "Talk about Japanese food and cooking.",
+    "culture": "Talk about Japanese culture. (Festivals, customs, traditions, etc.)",
+    "business": "Have a conversation in business Japanese. (Meetings, phone calls, emails, etc.)",
+    "anime": "Talk about anime and manga."
+}
+
+# --------------------------------------------------------------------------------------
+
+# System Prompt Template
+SYSTEM_PROMPT_TEMPLATE = """Your name is "{partner_name}". You are a Japanese person in your 20s living in Japan.
+{difficulty_prompt}
+
+Conversation Topic: {topic_prompt}
+
+Important Rules:
+- Have a natural conversation like a friend with a Korean Japanese learner
+- Occasionally ask questions to keep the conversation going
+- If the other person's Japanese is incorrect, naturally respond with the correct expression
+- Use emojis moderately to create a friendly atmosphere
+- Always respond in Japanese"""
+
+# --------------------------------------------------------------------------------------
+
+# Translation Prompt
+TRANSLATE_PROMPT = """You are a translator. Please translate the given Japanese into Korean. Output only the translation."""
+
+# --------------------------------------------------------------------------------------
+
+# Furigana Prompt
+FURIGANA_PROMPT = """Please add furigana to the given Japanese sentence.
+Display the reading in hiragana next to the kanji.
+Format: Kanji(furigana)
+Example: 今日(きょう)は天気(てんき)がいいですね。"""
+
+# --------------------------------------------------------------------------------------
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
