@@ -1,116 +1,248 @@
-# 🇯🇵 니혼고챗 (NihongoChat)
+🇯🇵 NihongoChat
 
-일본어를 공부하는 한국인을 위한 AI 채팅 웹앱입니다. GPT를 활용하여 일본인 친구와 대화하듯 자연스럽게 일본어를 연습할 수 있습니다.
+An AI chat web app designed for Koreans learning Japanese. Practice Japanese naturally as if you’re chatting with a Japanese friend using GPT.
 
-## ✨ 주요 기능
+✨ Key Features
+🗣️ Chat with an AI Japanese Friend
 
-### 🗣️ AI 일본인 친구와 대화
-- GPT-4o-mini 기반의 자연스러운 일본어 대화
-- 마치 일본인 친구와 채팅하는 것 같은 경험
-- 문법 실수를 자연스럽게 교정해줌
+Natural Japanese conversation powered by GPT-4o-mini
 
-### 📚 맞춤형 학습
-- **난이도 설정**: 초급, 중급, 고급 선택 가능
-- **주제별 대화**: 일상생활, 여행, 음식, 문화, 비즈니스, 애니메이션 등
-- **대화 상대 이름 커스터마이징**
+Experience chatting like you’re talking to a real Japanese friend
 
-### 📖 학습 도우미
-- **한국어 번역**: AI 메시지를 클릭하면 한국어 번역 확인 가능
-- **후리가나**: 한자 읽는 법을 함께 표시
-- 토글로 켜고 끄기 가능
+Grammar mistakes are corrected naturally
 
-## 🛠️ 기술 스택
+📚 Personalized Learning
 
-- **백엔드**: FastAPI (Python)
-- **프론트엔드**: HTML, CSS, JavaScript
-- **AI 모델**: OpenAI GPT-4o-mini
-- **저장소**: 브라우저 LocalStorage
+Difficulty Levels: Beginner, Intermediate, Advanced
 
-## 📱 시작하기
+Topic-based Conversations: Daily life, travel, food, culture, business, anime, etc.
 
-### 요구사항
-- Python 3.9 이상
-- OpenAI API 키
+Customizable Chat Partner Name
 
-### 설치 방법
+📖 Learning Assistant
 
-1. 의존성 설치:
-```bash
+Korean Translation: Click AI messages to see the Korean translation
+
+Furigana: Shows reading for kanji
+
+Toggle options available
+
+🛠️ Tech Stack
+
+Backend: FastAPI (Python)
+
+Frontend: HTML, CSS, JavaScript
+
+AI Model: OpenAI GPT-4o-mini
+
+Storage: Browser LocalStorage
+
+📱 Getting Started
+Requirements
+
+Python 3.9 or higher
+
+OpenAI API key
+
+Installation
+
+Install dependencies:
+
 cd /Users/naheepark/Desktop/Japanese
 pip install -r requirements.txt
-```
 
-2. 서버 실행:
-```bash
+
+Run the server:
+
 python main.py
-```
 
-또는 uvicorn으로 직접 실행:
-```bash
+
+Or run directly with uvicorn:
+
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
 
-3. 브라우저에서 열기:
-```
+
+Open in a browser:
+
 http://localhost:8000
-```
 
-4. 우측 상단 ⚙️ 설정에서 OpenAI API 키 입력
 
-### OpenAI API 키 발급
-1. [OpenAI Platform](https://platform.openai.com/)에 접속
-2. 계정 생성 또는 로그인
-3. API Keys 메뉴에서 새 키 생성
-4. 앱 설정 화면에서 키 입력
+Enter your OpenAI API key in the ⚙️ Settings at the top right
 
-## 📂 프로젝트 구조
+How to Get an OpenAI API Key
 
-```
+Go to OpenAI Platform
+
+Sign up or log in
+
+Create a new key in the API Keys menu
+
+Enter the key in the app settings
+
+📂 Project Structure
 Japanese/
-├── main.py              # FastAPI 서버
-├── requirements.txt     # Python 의존성
-├── README.md           # 프로젝트 설명
+├── main.py              # FastAPI server
+├── requirements.txt     # Python dependencies
+├── README.md            # Project description
 ├── templates/
-│   └── index.html      # 메인 HTML 템플릿
+│   └── index.html       # Main HTML template
 └── static/
-    ├── style.css       # 스타일시트
-    └── app.js          # 프론트엔드 JavaScript
-```
+    ├── style.css        # Stylesheet
+    └── app.js           # Frontend JavaScript
 
-## 🎨 스크린샷
+🎨 Screenshots
 
-앱 실행 시 다음과 같은 화면을 볼 수 있습니다:
-- 채팅 화면: 일본인 친구와 대화하는 인터페이스
-- 설정 모달: API 키, 난이도, 주제 등 설정
+When running the app, you can see:
 
-## 🔧 설정 옵션
+Chat interface: Talk with your AI Japanese friend
 
-| 설정 | 설명 |
-|------|------|
-| API 키 | OpenAI API 키 |
-| 대화 상대 이름 | AI 친구의 이름 (기본값: 유키) |
-| 난이도 | 초급/중급/고급 |
-| 대화 주제 | 자유 대화, 일상생활, 여행 등 |
-| 번역 보기 | AI 메시지 번역 표시 여부 |
-| 후리가나 보기 | 한자 읽기 표시 여부 |
+Settings modal: Set API key, difficulty, topic, etc.
 
-## 🔌 API 엔드포인트
+🔧 Settings Options
+Setting	Description
+API Key	OpenAI API key
+Chat Partner Name	AI friend’s name (default: Yuki)
+Difficulty	Beginner / Intermediate / Advanced
+Conversation Topic	Free chat, daily life, travel, etc.
+Show Translation	Toggle Korean translation of AI messages
+Show Furigana	Toggle kanji readings
+🔌 API Endpoints
+Endpoint	Method	Description
+/	GET	Main chat page
+/api/chat	POST	Chat with GPT
+/api/translate	POST	Japanese → Korean translation
+/api/furigana	POST	Generate furigana
+📝 License
 
-| 엔드포인트 | 메서드 | 설명 |
-|------------|--------|------|
-| `/` | GET | 메인 채팅 페이지 |
-| `/api/chat` | POST | GPT와 대화 |
-| `/api/translate` | POST | 일본어 → 한국어 번역 |
-| `/api/furigana` | POST | 후리가나 생성 |
+This project was created for personal learning and portfolio purposes.
 
-## 📝 라이선스
+🤝 Contributing
 
-이 프로젝트는 개인 학습 및 포트폴리오 목적으로 제작되었습니다.
+Report bugs or suggest features by opening an issue!
 
-## 🤝 기여
+Learn Japanese and enjoy chatting as if you have a friend! 🌸
 
-버그 리포트나 기능 제안은 이슈로 등록해주세요!
+원하시면 제가 이걸 더 깔끔하게 포트폴리오용 README 느낌으로 다듬어서 바로 GitHub에 올릴 수 있게 만들어줄 수도 있어요.
+혹시 그렇게 해드릴까요?
 
----
+나의 말:
+웅
+ChatGPT의 말:
 
-**일본어 공부, 이제 친구와 대화하듯 재미있게! 🌸**
+좋아요! 그럼 제가 지금 번역된 내용을 포트폴리오용 README 느낌으로 깔끔하게 다듬어서 GitHub에 바로 올릴 수 있도록 만들어드릴게요.
+
+🇯🇵 NihongoChat
+
+NihongoChat is an AI chat web app for Korean learners of Japanese. Practice Japanese naturally as if you’re chatting with a real Japanese friend!
+
+✨ Features
+🗣️ Chat with an AI Japanese Friend
+
+Natural Japanese conversation powered by GPT-4o-mini
+
+Experience realistic chatting with a Japanese friend
+
+Grammar mistakes are corrected naturally
+
+📚 Personalized Learning
+
+Difficulty Levels: Beginner, Intermediate, Advanced
+
+Topics: Daily life, travel, food, culture, business, anime, etc.
+
+Customizable AI friend name
+
+📖 Learning Tools
+
+Korean Translation: Click AI messages to see Korean translations
+
+Furigana: Displays kanji readings
+
+Toggle options available
+
+🛠️ Tech Stack
+
+Backend: FastAPI (Python)
+
+Frontend: HTML, CSS, JavaScript
+
+AI Model: OpenAI GPT-4o-mini
+
+Storage: Browser LocalStorage
+
+📱 Getting Started
+Requirements
+
+Python 3.9+
+
+OpenAI API key
+
+Installation
+# Install dependencies
+cd /path/to/Japanese
+pip install -r requirements.txt
+
+# Run the server
+python main.py
+
+# Or using uvicorn
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+
+Open your browser:
+
+http://localhost:8000
+
+
+Enter your OpenAI API key in the ⚙️ Settings menu.
+
+Get an OpenAI API Key
+
+Go to OpenAI Platform
+
+Sign up or log in
+
+Create a new key in API Keys
+
+Enter the key in the app settings
+
+📂 Project Structure
+Japanese/
+├── main.py              # FastAPI server
+├── requirements.txt     # Python dependencies
+├── README.md            # Project description
+├── templates/
+│   └── index.html       # Main HTML template
+└── static/
+    ├── style.css        # Stylesheet
+    └── app.js           # Frontend JavaScript
+
+🎨 Screenshots
+
+Chat Interface: Chat naturally with your AI Japanese friend
+
+Settings Modal: Configure API key, difficulty, topic, etc.
+
+🔧 Settings Options
+Setting	Description
+API Key	OpenAI API key
+AI Friend Name	Name of the AI chat partner (default: Yuki)
+Difficulty	Beginner / Intermediate / Advanced
+Conversation Topic	Free chat, daily life, travel, etc.
+Show Translation	Toggle Korean translations of AI messages
+Show Furigana	Toggle kanji readings
+🔌 API Endpoints
+Endpoint	Method	Description
+/	GET	Main chat page
+/api/chat	POST	Chat with GPT
+/api/translate	POST	Japanese → Korean translation
+/api/furigana	POST	Generate furigana
+📝 License
+
+This project is for personal learning and portfolio purposes.
+
+🤝 Contributing
+
+Bug reports or feature suggestions are welcome via issues.
+
+Practice Japanese in a fun and interactive way, like chatting with a friend! 🌸
